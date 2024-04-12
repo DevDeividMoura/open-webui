@@ -40,6 +40,36 @@
 	let showDropdown = false;
 	let isEditing = false;
 
+	// Função para lidar com mensagens recebidas
+	async function handleMessage(event) {
+		// Verificar a origem por segurança
+		// if (event.origin !== 'http://url-da-página-hospedeira.com') {
+		// 	return;
+		// }
+
+		// Desestruturação do tipo de ação
+		const { type, payload } = event.data;
+
+		switch (type) {
+			case 'updateChatList':
+				// Atualizar lista de chats
+				await chats.set(await getChatList(localStorage.token));
+				break;
+			case 'navigateChat':
+				// Navegar para o chat específico
+				goto(`/c/${payload.chatId}`);
+				break;
+			default:
+				console.error('Ação não reconhecida!');
+		}
+	}
+
+	// Adicionar o listener ao montar e remover ao desmontar
+	onMount(() => {
+		window.addEventListener('message', handleMessage);
+		
+	});
+
 	onMount(async () => {
 		if (window.innerWidth > 1024) {
 			show = true;
